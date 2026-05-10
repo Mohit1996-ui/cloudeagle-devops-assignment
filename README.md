@@ -291,6 +291,189 @@ If issues are detected:
 
 ---
 
+
+---
+
+# Infrastructure Design
+
+The infrastructure is designed to support:
+- Scalability
+- High availability
+- Secure access
+- Cost optimization
+- Easy operational management
+
+---
+
+# Compute Platform Choice
+
+The following options were evaluated:
+
+| Option | Advantages | Limitations |
+|---|---|---|
+| EC2 / Compute Engine | Simple setup | Manual scaling and management |
+| Cloud Run | Easy serverless deployment | Limited flexibility |
+| Kubernetes (EKS/GKE) | Highly scalable and production-ready | Slightly higher operational complexity |
+
+---
+
+# Recommended Choice: Kubernetes (EKS/GKE)
+
+Kubernetes is selected because it provides:
+- Auto-scaling
+- High availability
+- Container orchestration
+- Rolling and Blue/Green deployments
+- Better production scalability
+- Easier long-term maintenance
+
+Although AWS EKS terminology is used in this implementation, the same architecture maps directly to GKE on GCP.
+
+---
+
+# Proposed Architecture
+
+```text
+Users
+   ↓
+Load Balancer
+   ↓
+Ingress Controller
+   ↓
+Kubernetes Cluster (EKS/GKE)
+   ↓
+sync-service Pods
+   ↓
+MongoDB Atlas
+```
+
+Supporting services:
+- Container Registry
+- Secrets Manager
+- Monitoring Stack
+- Logging Stack
+- IAM Roles
+
+---
+
+# Auto Scaling
+
+Horizontal Pod Autoscaler (HPA) is used to scale application pods automatically.
+
+Scaling metrics:
+- CPU utilization
+- Memory utilization
+- Request load
+
+Example configuration:
+
+```yaml
+minReplicas: 2
+maxReplicas: 10
+```
+
+Benefits:
+- Handles traffic spikes
+- Improves availability
+- Optimizes infrastructure cost
+
+---
+
+# MongoDB Hosting Strategy
+
+MongoDB Atlas is recommended instead of self-hosted MongoDB.
+
+Advantages:
+- Managed backups
+- Automatic scaling
+- High availability
+- Reduced operational overhead
+- Easier maintenance
+
+This is especially useful for startup environments with smaller operations teams.
+
+---
+
+# Networking Design
+
+The infrastructure uses a secure VPC-based architecture.
+
+Traffic flow:
+
+```text
+Internet
+   ↓
+Application Load Balancer
+   ↓
+Ingress Controller
+   ↓
+Kubernetes Services
+   ↓
+Application Pods
+```
+
+Security considerations:
+- Only load balancer exposed publicly
+- Private cluster networking
+- Restricted database access
+- Firewall rules with least privilege access
+
+---
+
+# IAM & Security
+
+Security follows the principle of least privilege.
+
+Examples:
+- Jenkins deployment role
+- Kubernetes service accounts
+- Read-only monitoring permissions
+
+Secrets are securely managed using:
+- AWS Secrets Manager
+- Kubernetes Secrets
+
+Hardcoded credentials are avoided completely.
+
+---
+
+# Logging & Monitoring
+
+Monitoring stack:
+- CloudWatch
+- Prometheus
+- Grafana
+
+Logs collected:
+- Application logs
+- Container logs
+- Deployment logs
+- Audit logs
+
+Metrics monitored:
+- CPU usage
+- Memory usage
+- Response times
+- Error rates
+- Pod health
+- Deployment failures
+
+This helps improve observability and faster issue detection.
+
+---
+
+# Cost Optimization
+
+The design includes multiple cost optimization strategies:
+
+- Auto-scaling infrastructure
+- Smaller non-production environments
+- Spot instances for QA workloads
+- Managed database services
+- Container-based deployments
+- Shared monitoring stack
+
+This provides a balance between scalability and startup budget constraints.
 # Zero Downtime Approach
 
 The deployment design minimizes downtime using:
