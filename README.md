@@ -50,5 +50,29 @@ Equivalent GCP services can be substituted easily.
 | EKS | GKE |
 | ECR | Artifact Registry |
 | Secrets Manager | Secret Manager |
+
+
+
+---
+
+# Branching Strategy
+
+The repository follows a GitFlow-inspired branching model.
+
+| Branch | Purpose | Environment |
+|---|---|---|
+| feature/* | Feature development | Temporary testing |
+| develop | Integration branch | QA |
+| release/* | Release validation | Staging |
+| main | Stable production code | Production |
+
+## Workflow
+
+### Feature Development
+Developers create feature branches from `develop`.
+
+Example:
+```bash
+feature/user-sync-api
 | CloudWatch | Cloud Monitoring |
 | ALB | GCP Load Balancer |
