@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: sync-service
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: sync-service
+
+  template:
+    metadata:
+      labels:
+        app: sync-service
+
+    spec:
+      containers:
+      - name: sync-service
+
+        image: your-ecr-repository/sync-service:latest
+
+        ports:
+        - containerPort: 8080
+
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: sync-service-secret
+              key: mongo-uri
+
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+
+          initialDelaySeconds: 30
+          periodSeconds: 10
