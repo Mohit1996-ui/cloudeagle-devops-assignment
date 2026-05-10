@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: sync-service-ingress
+
+spec:
+  rules:
+  - host: sync-service.example.com
+
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+
+        backend:
+          service:
+            name: sync-service
+            port:
+              number: 80
