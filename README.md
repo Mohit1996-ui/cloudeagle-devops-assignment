@@ -186,6 +186,123 @@ sync-service:v1.0.0
 sync-service:v1.0.1
 ```
 
+
+
+---
+
+# Configuration Management
+
+The application uses environment-specific configuration files.
+
+Examples:
+
+```text
+application-qa.yml
+application-staging.yml
+application-prod.yml
+```
+
+These files contain:
+- Database endpoints
+- API URLs
+- Feature flags
+- Logging configurations
+- Timeout settings
+
+This helps maintain clear separation between environments.
+
+---
+
+# Secrets Management
+
+Sensitive information is never stored directly in Git repositories.
+
+Examples of secrets:
+- MongoDB credentials
+- API keys
+- JWT secrets
+- Service credentials
+
+Recommended secret handling approach:
+- AWS Secrets Manager
+- Kubernetes Secrets
+- Jenkins Credentials Store
+
+The application retrieves secrets securely during runtime.
+
+Example:
+
+```properties
+spring.data.mongodb.uri=${MONGO_URI}
+```
+
+Benefits:
+- Improved security
+- Centralized secret management
+- Easier credential rotation
+- Reduced risk of credential exposure
+
+---
+
+# Deployment Strategy
+
+Three deployment approaches were evaluated:
+
+| Strategy | Downtime | Risk | Recommendation |
+|---|---|---|
+| Recreate | High | High | Not Recommended |
+| Rolling Deployment | Low | Medium | Good |
+| Blue/Green Deployment | Near Zero | Low | Recommended |
+
+---
+
+# Recommended Strategy: Blue/Green Deployment
+
+Blue/Green deployment is selected for production because it provides:
+- Near-zero downtime
+- Safer production releases
+- Easier rollback
+- Reduced deployment risk
+
+---
+
+# Deployment Flow
+
+## Current Production
+The current stable environment (Blue) serves live traffic.
+
+## New Release
+The new application version is deployed to the Green environment.
+
+## Validation
+The Green environment undergoes:
+- Health checks
+- Smoke testing
+- Monitoring validation
+
+## Traffic Switch
+After validation:
+- Load balancer traffic shifts from Blue to Green
+
+## Failure Scenario
+If issues are detected:
+- Traffic immediately switches back to Blue
+- Rollback is completed quickly
+
+---
+
+# Zero Downtime Approach
+
+The deployment design minimizes downtime using:
+- Load balancer traffic routing
+- Multiple application replicas
+- Kubernetes readiness probes
+- Health checks
+- Blue/Green deployment strategy
+- Graceful container shutdown
+
+This ensures high availability during deployments.
+
 If deployment fails:
 - Traffic is reverted to previous stable version
 - Previous Docker image is redeployed
